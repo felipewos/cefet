@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Comunicado Escolar</title>
-  
+  <script>
+    const senha = prompt("Digite a senha para acessar este site:");
+    if (senha !== "unedpet") {
+      alert("Senha incorreta!");
+      window.location.href = "https://felipewos.github.io/cefet/";
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
@@ -64,7 +70,6 @@
     <div style="border-bottom: 1px solid black; width: 300px; margin: 0 auto;"></div>
     <p style="margin-top: 5px;">Assinatura do Coordenador(a)</p>
   </div>
-
   <hr style="margin: 10px 0; border: 1px dashed black;">
   <div style="line-height: 1.5; font-size: 14px;">
     <p>Eu, ____________________________________, identidade nº ____________, órgão expedidor __________, responsável pelo(a) aluno(a) <strong><span class="nome_out"></span></strong>, declaro estar ciente do Comunicado de <span class="tipo_out"></span> nº <span class="numero_out"></span>/<span id="ano_out"></span>, emitido em <span class="data_out"></span>.</p>
@@ -74,7 +79,6 @@
       <p style="margin-top: 5px;">Assinatura do responsável</p>
     </div>
   </div>
-
   <hr style="margin: 10px 0; border: 1px dashed black;">
   <div style="line-height: 1.5; font-size: 14px;">
     <p>Eu, <strong><span class="nome_out"></span></strong>, aluno(a) do <span class="turma_out"></span> do Curso Técnico em <span class="curso_out"></span> Integrado ao Ensino Médio, declaro estar ciente do Comunicado de <span class="tipo_out"></span> nº <span class="numero_out"></span>/<span id="ano_out"></span>, emitido em <span class="data_out"></span>. Comprometo-me a entregá-lo devidamente assinado pelo meu responsável no próximo dia letivo.</p>
@@ -87,7 +91,86 @@
 </div>
 
 <script>
-// ... todas as funções anteriores como ajustarInfracoesEObservacoes(), preencherDados(), gerarComunicado() continuam ...
+const infracoes = {
+  "Advertência": [
+    "Ausentou-se de atividade acadêmica (educacional, esportiva ou cultural), sem prévia autorização superior.",
+    "Perturbou o exercício das atividades pedagógicas, científicas e administrativas.",
+    "Utilizou-se de métodos ilícitos na realização de trabalhos escolares e outras atividades.",
+    "Expôs a si ou a outrem a situação de risco ou contribuiu para tal exposição.",
+    "Transgrediu normas internas e/ou regulamentos aprovados pelos órgãos competentes."
+  ],
+  "Suspensão": [
+    "Reincidiu em falta punida com advertência.",
+    "Atentou contra a integridade física ou moral de qualquer membro da comunidade escolar.",
+    "Utilizou ou portou drogas ilícitas ou bebida alcóolica nas dependências do Centro.",
+    "Coagiu ou aliciou colegas para participarem de atividades ilícitas ou usarem drogas e bebidas alcóolicas.",
+    "Danificou o patrimônio científico, cultural e material do Centro ou de qualquer membro da comunidade escolar."
+  ]
+};
+
+function ajustarInfracoesEObservacoes() {
+  const tipo = document.getElementById("tipo").value;
+  const infracaoSelect = document.getElementById("infracao");
+  const obsSelect = document.getElementById("obs");
+  infracaoSelect.innerHTML = "";
+  obsSelect.innerHTML = "";
+  if (infracoes[tipo]) {
+    infracoes[tipo].forEach(texto => {
+      const opt = document.createElement("option");
+      opt.value = texto;
+      opt.textContent = texto;
+      infracaoSelect.appendChild(opt);
+    });
+  }
+  if (observacoes[tipo]) {
+    observacoes[tipo].forEach(texto => {
+      const opt = document.createElement("option");
+      opt.value = texto;
+      opt.textContent = texto;
+      obsSelect.appendChild(opt);
+    });
+  }
+  document.getElementById("suspensao_campos").style.display = tipo === "Suspensão" ? "block" : "none";
+}
+
+function preencherDados() {
+  const [nome, turma, curso] = document.getElementById("aluno").value.split("|");
+  document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
+  document.querySelectorAll(".turma_out").forEach(el => el.textContent = turma);
+  document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
+}
+
+function gerarComunicado() {
+  const numero = document.getElementById("numero").value;
+  if (!numero) return alert("Por favor, insira o número do comunicado.");
+  const tipo = document.getElementById("tipo").value;
+  const infracao = document.getElementById("infracao").value;
+  const obs = document.getElementById("obs").value;
+  const [nome, turma, curso] = document.getElementById("aluno").value.split("|");
+  const dataAtual = new Date();
+  const dataFormatada = dataAtual.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const ano = dataAtual.getFullYear();
+  document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
+  document.querySelectorAll(".turma_out").forEach(el => el.textContent = turma);
+  document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
+  document.querySelectorAll("#ano_out").forEach(el => el.textContent = ano);
+  document.querySelectorAll(".tipo_out").forEach(el => el.textContent = tipo);
+  document.querySelectorAll(".infracao_out").forEach(el => el.textContent = infracao);
+  document.querySelectorAll(".obs_out").forEach(el => el.textContent = obs);
+  document.querySelectorAll(".data_out").forEach(el => el.textContent = dataFormatada);
+  document.querySelectorAll(".numero_out").forEach(el => el.textContent = numero);
+  const paragrafo = document.getElementById("paragrafo_principal");
+  if (tipo === "Suspensão") {
+    const dias = document.getElementById("dias_suspensao").value;
+    const dataRetorno = document.getElementById("data_retorno").value;
+    const horaRetorno = document.getElementById("hora_retorno").value;
+    const retornoFormatado = new Date(dataRetorno).toLocaleDateString('pt-BR');
+    paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido suspenso(a) por ${dias} (dias), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96). O(A) referido(a) aluno(a) deverá retornar às aulas em ${retornoFormatado}. Diante disso, solicitamos o seu comparecimento ao campus em ${retornoFormatado}, às ${horaRetorno} horas.`;
+  } else {
+    paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido advertido(a), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96).`;
+  }
+  document.getElementById("comunicado").style.display = "block";
+}
 
 function baixarPDF() {
   const tipo = document.getElementById("tipo").value;
@@ -115,9 +198,9 @@ function baixarPDF() {
     const pdfBase64 = pdfDataUri.split(',')[1];
 
     const destinatarios = [
-      "felipe.mat@hotmail.com",
-      "felipewagner83@gmail.com",
-      "fwosteste1@gmail.com"
+      "coordenacao@cefet-rj.br",
+      "gerencia@cefet-rj.br",
+      "saped@cefet-rj.br"
     ];
 
     fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
