@@ -22,7 +22,7 @@
 <h2>Gerar Comunicado</h2>
 
 <label>Nome do aluno:</label>
-<select id="aluno" onchange="preencherDados()">
+<select id="aluno" onchange="preencherDados(); verificarCampos()">
   <option value="">-- Selecione --</option>
   <option value="Accacio Oliveira de Morais|3º ano|Telecomunicações">Accacio Oliveira de Morais</option>
   <option value="Alexandre Costa dos Santos Simões Sant'Ana|2º ano|Telecomunicações">Alexandre Costa dos Santos Simões Sant'Ana</option>
@@ -30,7 +30,7 @@
 </select>
 
 <label>Tipo de comunicado:</label>
-<select id="tipo" onchange="ajustarInfracoes()">
+<select id="tipo" onchange="ajustarInfracoes(); verificarCampos()">
   <option value="">-- Selecione --</option>
   <option value="Advertência">Advertência</option>
   <option value="Suspensão">Suspensão</option>
@@ -43,7 +43,7 @@
 <textarea id="obs" rows="4" placeholder="Digite a observação aqui..."></textarea>
 
 <label>Número do comunicado:</label>
-<input type="number" id="numero">
+<input type="number" id="numero" oninput="verificarCampos()">
 
 <div id="suspensao_campos" style="display:none;">
   <label>Número de dias de suspensão:</label>
@@ -58,7 +58,7 @@
 
 <button onclick="gerarComunicado()">Gerar Comunicado</button>
 <button onclick="baixarPDF()">Salvar como PDF</button>
-<button onclick="enviarPorEmail()">Enviar por e-mail</button>
+<button id="btnEnviar" onclick="enviarPorEmail()" disabled>Enviar por e-mail</button>
 <div id="status" style="margin-top:10px; color: green; font-weight: bold;"></div>
 
 <div id="comunicado" style="display:none">
@@ -92,23 +92,50 @@
 </div>
 
 <script>
+const infracoes = {
+  "Advertência": ["Ausentou-se de atividade..."],
+  "Suspensão": ["Reincidiu em falta punida..."]
+};
 
-function enviarPorEmail() {
+function ajustarInfracoes() {
+  const tipo = document.getElementById("tipo").value;
+  const infracaoSelect = document.getElementById("infracao");
+  infracaoSelect.innerHTML = "";
+  if (infracoes[tipo]) {
+    infracoes[tipo].forEach(texto => {
+      const opt = document.createElement("option");
+      opt.value = texto;
+      opt.textContent = texto;
+      infracaoSelect.appendChild(opt);
+    });
+  }
+  document.getElementById("suspensao_campos").style.display = tipo === "Suspensão" ? "block" : "none";
+}
+
+function verificarCampos() {
+  const aluno = document.getElementById("aluno").value;
   const tipo = document.getElementById("tipo").value;
   const numero = document.getElementById("numero").value;
-  const alunoValor = document.getElementById("aluno").value;
+  const btn = document.getElementById("btnEnviar");
+  btn.disabled = !(aluno && tipo && numero);
+}
 
-  if (!alunoValor || !numero || !tipo) {
-    alert("Por favor, preencha todos os campos e gere o comunicado antes de enviar.");
-    return;
-  }
+function preencherDados() {
+  const [nome, turma, curso] = document.getElementById("aluno").value.split("|");
+  document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
+  document.querySelectorAll(".turma_out").forEach(el => el.textContent = turma);
+  document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
+}
 
-  const [nome] = alunoValor.split("|");
+function enviarPorEmail() {
+  const element = document.getElementById("comunicado");
+  const tipo = document.getElementById("tipo").value;
+  const numero = document.getElementById("numero").value;
+  const [nome] = document.getElementById("aluno").value.split("|");
   const tipoPrefix = tipo === "Advertência" ? "adv" : "sus";
   const nomeFormatado = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
   const filename = `${tipoPrefix}${numero}_${nomeFormatado}.pdf`;
 
-  const element = document.getElementById("comunicado");
   const status = document.getElementById("status");
   status.style.color = "green";
   status.textContent = "Enviando comunicado por e-mail... aguarde.";
@@ -142,8 +169,6 @@ function enviarPorEmail() {
     });
   });
 }
-
-
 </script>
 
 </body>
