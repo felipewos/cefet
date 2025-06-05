@@ -22,7 +22,7 @@
 <h2>Gerar Comunicado</h2>
 
 <label>Nome do aluno:</label>
-<select id="aluno" onchange="preencherDados(); verificarCampos()">
+<select id="aluno" onchange="preencherDados()">
   <option value="">-- Selecione --</option>
   <option value="Accacio Oliveira de Morais|3º ano|Telecomunicações">Accacio Oliveira de Morais</option>
   <option value="Alexandre Costa dos Santos Simões Sant'Ana|2º ano|Telecomunicações">Alexandre Costa dos Santos Simões Sant'Ana</option>
@@ -30,7 +30,7 @@
 </select>
 
 <label>Tipo de comunicado:</label>
-<select id="tipo" onchange="ajustarInfracoes(); verificarCampos()">
+<select id="tipo" onchange="ajustarInfracoes()">
   <option value="">-- Selecione --</option>
   <option value="Advertência">Advertência</option>
   <option value="Suspensão">Suspensão</option>
@@ -43,7 +43,7 @@
 <textarea id="obs" rows="4" placeholder="Digite a observação aqui..."></textarea>
 
 <label>Número do comunicado:</label>
-<input type="number" id="numero" oninput="verificarCampos()">
+<input type="number" id="numero">
 
 <div id="suspensao_campos" style="display:none;">
   <label>Número de dias de suspensão:</label>
@@ -58,7 +58,7 @@
 
 <button onclick="gerarComunicado()">Gerar Comunicado</button>
 <button onclick="baixarPDF()">Salvar como PDF</button>
-<button id="btnEnviar" onclick="enviarPorEmail()" disabled>Enviar por e-mail</button>
+<button onclick="enviarPorEmail()">Enviar por e-mail</button>
 <div id="status" style="margin-top:10px; color: green; font-weight: bold;"></div>
 
 <div id="comunicado" style="display:none">
@@ -93,8 +93,20 @@
 
 <script>
 const infracoes = {
-  "Advertência": ["Ausentou-se de atividade..."],
-  "Suspensão": ["Reincidiu em falta punida..."]
+  "Advertência": [
+    "Ausentou-se de atividade acadêmica (educacional, esportiva ou cultural), sem prévia autorização superior.",
+    "Perturbou o exercício das atividades pedagógicas, científicas e administrativas.",
+    "Utilizou-se de métodos ilícitos na realização de trabalhos escolares e outras atividades.",
+    "Expôs a si ou a outrem a situação de risco ou contribuiu para tal exposição.",
+    "Transgrediu normas internas e/ou regulamentos aprovados pelos órgãos competentes."
+  ],
+  "Suspensão": [
+    "Reincidiu em falta punida com advertência.",
+    "Atentou contra a integridade física ou moral de qualquer membro da comunidade escolar.",
+    "Utilizou ou portou drogas ilícitas ou bebida alcóolica nas dependências do Centro.",
+    "Coagiu ou aliciou colegas para participarem de atividades ilícitas ou usarem drogas e bebidas alcóolicas.",
+    "Danificou o patrimônio científico, cultural e material do Centro ou de qualquer membro da comunidade escolar."
+  ]
 };
 
 function ajustarInfracoes() {
@@ -112,14 +124,6 @@ function ajustarInfracoes() {
   document.getElementById("suspensao_campos").style.display = tipo === "Suspensão" ? "block" : "none";
 }
 
-function verificarCampos() {
-  const aluno = document.getElementById("aluno").value;
-  const tipo = document.getElementById("tipo").value;
-  const numero = document.getElementById("numero").value;
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = !(aluno && tipo && numero);
-}
-
 function preencherDados() {
   const [nome, turma, curso] = document.getElementById("aluno").value.split("|");
   document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
@@ -127,7 +131,39 @@ function preencherDados() {
   document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
 }
 
-function enviarPorEmail() {
+function gerarComunicado() {
+  const numero = document.getElementById("numero").value;
+  if (!numero) return alert("Por favor, insira o número do comunicado.");
+  const tipo = document.getElementById("tipo").value;
+  const infracao = document.getElementById("infracao").value;
+  const obs = document.getElementById("obs").value;
+  const [nome, turma, curso] = document.getElementById("aluno").value.split("|");
+  const dataAtual = new Date();
+  const dataFormatada = dataAtual.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const ano = dataAtual.getFullYear();
+  document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
+  document.querySelectorAll(".turma_out").forEach(el => el.textContent = turma);
+  document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
+  document.querySelectorAll("#ano_out").forEach(el => el.textContent = ano);
+  document.querySelectorAll(".tipo_out").forEach(el => el.textContent = tipo);
+  document.querySelectorAll(".infracao_out").forEach(el => el.textContent = infracao);
+  document.querySelectorAll(".obs_out").forEach(el => el.textContent = obs);
+  document.querySelectorAll(".data_out").forEach(el => el.textContent = dataFormatada);
+  document.querySelectorAll(".numero_out").forEach(el => el.textContent = numero);
+  const paragrafo = document.getElementById("paragrafo_principal");
+  if (tipo === "Suspensão") {
+    const dias = document.getElementById("dias_suspensao").value;
+    const dataRetorno = document.getElementById("data_retorno").value;
+    const horaRetorno = document.getElementById("hora_retorno").value;
+    const retornoFormatado = new Date(dataRetorno).toLocaleDateString('pt-BR');
+    paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido suspenso(a) por ${dias} (dias), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96). O(A) referido(a) aluno(a) deverá retornar às aulas em ${retornoFormatado}. Diante disso, solicitamos o seu comparecimento ao campus em ${retornoFormatado}, às ${horaRetorno} horas.`;
+  } else {
+    paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido advertido(a), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96).`;
+  }
+  document.getElementById("comunicado").style.display = "block";
+}
+
+function baixarPDF() {
   const element = document.getElementById("comunicado");
   const tipo = document.getElementById("tipo").value;
   const numero = document.getElementById("numero").value;
@@ -135,8 +171,26 @@ function enviarPorEmail() {
   const tipoPrefix = tipo === "Advertência" ? "adv" : "sus";
   const nomeFormatado = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
   const filename = `${tipoPrefix}${numero}_${nomeFormatado}.pdf`;
+  html2pdf().set({ margin: 1, filename: filename }).from(element).save();
+}
 
+function enviarPorEmail() {
+  const tipo = document.getElementById("tipo").value;
+  const numero = document.getElementById("numero").value;
+  const alunoValue = document.getElementById("aluno").value;
+
+  if (!numero || !tipo || !alunoValue) {
+    alert("Preencha todos os campos obrigatórios antes de enviar o e-mail.");
+    return;
+  }
+
+  const [nome] = alunoValue.split("|");
+  const tipoPrefix = tipo === "Advertência" ? "adv" : "sus";
+  const nomeFormatado = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+  const filename = `${tipoPrefix}${numero}_${nomeFormatado}.pdf`;
+  const element = document.getElementById("comunicado");
   const status = document.getElementById("status");
+
   status.style.color = "green";
   status.textContent = "Enviando comunicado por e-mail... aguarde.";
 
@@ -147,6 +201,7 @@ function enviarPorEmail() {
       "felipewagner83@gmail.com",
       "fwosteste1@gmail.com"
     ];
+
     fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -169,6 +224,9 @@ function enviarPorEmail() {
     });
   });
 }
+
+
+  
 </script>
 
 </body>
