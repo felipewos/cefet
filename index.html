@@ -186,7 +186,9 @@ function enviarPorEmail() {
 
   const [nome] = alunoValue.split("|");
   const tipoPrefix = tipo === "Advertência" ? "adv" : "sus";
-  const nomeFormatado = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+  const nomeFormatado = nome.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "");
   const filename = `${tipoPrefix}${numero}_${nomeFormatado}.pdf`;
   const element = document.getElementById("comunicado");
   const status = document.getElementById("status");
@@ -194,36 +196,41 @@ function enviarPorEmail() {
   status.style.color = "green";
   status.textContent = "Enviando comunicado por e-mail... aguarde.";
 
-  html2pdf().set({ margin: 1, filename: filename }).from(element).outputPdf('datauristring').then((pdfDataUri) => {
-    const pdfBase64 = pdfDataUri.split(',')[1];
-    const destinatarios = [
-      "felipe.mat@hotmail.com",
-      "felipewagner83@gmail.com",
-      "fwosteste1@gmail.com"
-    ];
+  html2pdf().set({ margin: 1, filename: filename })
+    .from(element)
+    .outputPdf('datauristring')
+    .then((pdfDataUri) => {
+      const pdfBase64 = pdfDataUri.split(',')[1];
+      const destinatarios = [
+        "felipe.mat@hotmail.com",
+        "felipewagner83@gmail.com",
+        "fwosteste1@gmail.com"
+      ];
 
-    fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nomeArquivo: filename,
-        pdfBase64: pdfBase64,
-        destinatario: destinatarios.join(","),
-        nome: nome,
-        numero: numero
+      fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nomeArquivo: filename,
+          pdfBase64: pdfBase64,
+          destinatario: destinatarios.join(","),
+          nome: nome,
+          numero: numero,
+          tipo: tipo // Enviando o tipo para o backend decidir o corpo do e-mail
+        })
       })
-    })
-    .then(res => res.json())
-    .then(data => {
-      status.textContent = "Comunicado enviado por e-mail com sucesso!";
-      status.style.color = "green";
-    })
-    .catch(err => {
-      status.textContent = "Erro ao enviar e-mail: " + err.message;
-      status.style.color = "red";
+      .then(res => res.json())
+      .then(data => {
+        status.textContent = "Comunicado enviado por e-mail com sucesso!";
+        status.style.color = "green";
+      })
+      .catch(err => {
+        status.textContent = "Erro ao enviar e-mail: " + err.message;
+        status.style.color = "red";
+      });
     });
-  });
 }
+
 
 
   
