@@ -195,24 +195,25 @@ function enviarPorEmail() {
       "fwosteste1@gmail.com"
     ];
     fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nomeArquivo: filename,
-        pdfBase64: pdfBase64,
-        destinatario: destinatarios.join(",")
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      status.textContent = "Comunicado enviado por e-mail com sucesso!";
-      status.style.color = "green";
-    })
-    .catch(err => {
-      status.textContent = "Erro ao enviar e-mail: " + err.message;
-      status.style.color = "red";
-    });
-  });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    nomeArquivo: filename,
+    pdfBase64: pdfBase64,
+    destinatario: destinatarios.join(","),
+    nome: nome,
+    numero: numero
+  })
+})
+.then(res => res.json())
+.then(data => {
+  status.textContent = "Comunicado enviado por e-mail com sucesso!";
+  status.style.color = "green";
+})
+.catch(err => {
+  status.textContent = "Erro ao enviar e-mail: " + err.message;
+  status.style.color = "red";
+});
 }
 </script>
 
