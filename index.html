@@ -308,9 +308,9 @@ function enviarPorEmail() {
     .then((pdfDataUri) => {
       const pdfBase64 = pdfDataUri.split(',')[1];
       const destinatarios = [
-        "felipe.mat@hotmail.com",
-        "felipewagner83@gmail.com",
-        "fwosteste1@gmail.com"
+        "jurair.junior@cefet-rj.br",
+        "renan.moutinho@cefet-rj.br",
+        "saped.petropolis@cefet-rj.br"
       ];
 
       fetch("https://comunicado-backend.onrender.com/enviar-comunicado", {
