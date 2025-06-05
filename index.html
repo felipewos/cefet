@@ -94,14 +94,21 @@
 <script>
 
 function enviarPorEmail() {
-  const element = document.getElementById("comunicado");
   const tipo = document.getElementById("tipo").value;
   const numero = document.getElementById("numero").value;
-  const [nome] = document.getElementById("aluno").value.split("|");
+  const alunoValor = document.getElementById("aluno").value;
+
+  if (!alunoValor || !numero || !tipo) {
+    alert("Por favor, preencha todos os campos e gere o comunicado antes de enviar.");
+    return;
+  }
+
+  const [nome] = alunoValor.split("|");
   const tipoPrefix = tipo === "Advertência" ? "adv" : "sus";
   const nomeFormatado = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
   const filename = `${tipoPrefix}${numero}_${nomeFormatado}.pdf`;
 
+  const element = document.getElementById("comunicado");
   const status = document.getElementById("status");
   status.style.color = "green";
   status.textContent = "Enviando comunicado por e-mail... aguarde.";
@@ -135,6 +142,7 @@ function enviarPorEmail() {
     });
   });
 }
+
 
 </script>
 
