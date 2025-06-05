@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Comunicado Escolar</title>
+  <script>
+    const senha = prompt("Digite a senha para acessar este site:");
+    if (senha !== "1234") {
+      alert("Senha incorreta!");
+      window.location.href = "https://www.google.com"; // ou outro site
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
@@ -16,8 +23,8 @@
 
 <label>Nome do aluno:</label>
 <select id="aluno" onchange="preencherDados()">
-  <option value="">-- Selecione --</option>
-  <option value="Accacio Oliveira de Morais|3º ano|Telecomunicações">Accacio Oliveira de Morais</option>
+<option value="">-- Selecione --</option>
+<option value="Accacio Oliveira de Morais|3º ano|Telecomunicações">Accacio Oliveira de Morais</option>
 <option value="Alexandre Costa dos Santos Simões Sant'Ana|2º ano|Telecomunicações">Alexandre Costa dos Santos Simões Sant'Ana</option>
 <option value="Alice de Souza Cruz Filgueiras|1º ano B|Telecomunicações">Alice de Souza Cruz Filgueiras</option>
 <option value="Alice Ribeiro de Macedo|2º ano|Telecomunicações">Alice Ribeiro de Macedo</option>
