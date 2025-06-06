@@ -173,10 +173,23 @@
   <p><em><span class="infracao_out"></span></em></p>
   <p>Observação: <span class="obs_out"></span></p>
   <p style="text-align: center;">Petrópolis, <span class="data_out"></span>.</p>
-  <div style="text-align: center; margin-top: 60px;">
+  <div id="assinaturas_container" style="margin-top: 60px;">
+  <div id="assinaturas_extras" style="display: none; display: flex; justify-content: space-around; margin-bottom: 40px;">
+    <div style="text-align: center;">
+      <div style="border-bottom: 1px solid black; width: 250px;"></div>
+      <p style="margin-top: 5px;">Assinatura do Gerente Acadêmico/Diretor</p>
+    </div>
+    <div style="text-align: center;">
+      <div style="border-bottom: 1px solid black; width: 250px;"></div>
+      <p style="margin-top: 5px;">Assinatura do Coordenador(a)</p>
+    </div>
+  </div>
+
+  <div id="assinatura_simples" style="text-align: center;">
     <div style="border-bottom: 1px solid black; width: 300px; margin: 0 auto;"></div>
     <p style="margin-top: 5px;">Assinatura do Coordenador(a)</p>
   </div>
+</div>
   <hr style="margin: 10px 0; border: 1px dashed black;">
   <div style="line-height: 1.5; font-size: 14px;">
     <p>Eu, ____________________________________, identidade nº ____________, órgão expedidor __________, responsável pelo(a) aluno(a) <strong><span class="nome_out"></span></strong>, declaro estar ciente do Comunicado de <span class="tipo_out"></span> nº <span class="numero_out"></span>/<span id="ano_out"></span>, emitido em <span class="data_out"></span>.</p>
@@ -247,6 +260,7 @@ function gerarComunicado() {
   const dataAtual = new Date();
   const dataFormatada = dataAtual.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const ano = dataAtual.getFullYear();
+
   document.querySelectorAll(".nome_out").forEach(el => el.textContent = nome);
   document.querySelectorAll(".turma_out").forEach(el => el.textContent = turma);
   document.querySelectorAll(".curso_out").forEach(el => el.textContent = curso);
@@ -256,19 +270,30 @@ function gerarComunicado() {
   document.querySelectorAll(".obs_out").forEach(el => el.textContent = obs);
   document.querySelectorAll(".data_out").forEach(el => el.textContent = dataFormatada);
   document.querySelectorAll(".numero_out").forEach(el => el.textContent = numero);
+
   const paragrafo = document.getElementById("paragrafo_principal");
+
   if (tipo === "Suspensão") {
     const dias = document.getElementById("dias_suspensao").value;
     const dataRetorno = document.getElementById("data_retorno").value;
     const horaRetorno = document.getElementById("hora_retorno").value;
     const retornoFormatado = new Date(dataRetorno).toLocaleDateString('pt-BR');
     paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido suspenso(a) por ${dias} (dias), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96). O(A) referido(a) aluno(a) deverá retornar às aulas em ${retornoFormatado}. Diante disso, solicitamos o seu comparecimento ao campus em ${retornoFormatado}, às ${horaRetorno} horas.`;
+
+    // Mostrar bloco com duas assinaturas
+    document.getElementById("assinaturas_extras").style.display = "flex";
+    document.getElementById("assinatura_simples").style.display = "none";
+
   } else {
     paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido advertido(a), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96).`;
+
+    // Mostrar assinatura simples apenas
+    document.getElementById("assinaturas_extras").style.display = "none";
+    document.getElementById("assinatura_simples").style.display = "block";
   }
+
   document.getElementById("comunicado").style.display = "block";
 }
-
 function baixarPDF() {
   const element = document.getElementById("comunicado");
   const tipo = document.getElementById("tipo").value;
