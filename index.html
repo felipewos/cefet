@@ -277,7 +277,7 @@ function gerarComunicado() {
     const dias = document.getElementById("dias_suspensao").value;
     const dataRetorno = document.getElementById("data_retorno").value;
     const horaRetorno = document.getElementById("hora_retorno").value;
-    const retornoFormatado = new Date(dataRetorno).toLocaleDateString('pt-BR');
+    const retornoFormatado = new Date(dataRetorno + "T12:00:00").toLocaleDateString('pt-BR');
     paragrafo.innerHTML = `Sr.(a) Responsável,<br><br>Comunicamos que o(a) aluno(a) <strong>${nome}</strong>, do ${turma} do Curso Técnico em ${curso} Integrado ao Ensino Médio, cometeu, nesta data, a infração disciplinar abaixo especificada, tendo sido suspenso(a) por ${dias} (dia(s)), conforme prevê o Regulamento Disciplinar Discente do CEFET/RJ (Resolução nº 2/96). O(A) referido(a) aluno(a) deverá retornar às aulas em ${retornoFormatado}. Diante disso, solicitamos o seu comparecimento ao campus em ${retornoFormatado}, às ${horaRetorno} horas.`;
 
     // Mostrar bloco com duas assinaturas
